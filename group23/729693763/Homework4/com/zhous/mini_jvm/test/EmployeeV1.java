@@ -1,4 +1,7 @@
-package com.coderising.jvm.test;
+package com.zhous.mini_jvm.test;
+
+import com.zhous.mini_jvm.loader.ClassFileLoader;
+import org.junit.Assert;
 
 public class EmployeeV1 {
 	
@@ -22,7 +25,8 @@ public class EmployeeV1 {
     }
     public static void main(String[] args){
     	EmployeeV1 p = new EmployeeV1("Andy",29);
-    	p.sayHello();    
-    	
+    	p.sayHello();
+
+
     }
 }
