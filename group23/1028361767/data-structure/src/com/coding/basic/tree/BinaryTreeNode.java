@@ -2,10 +2,10 @@ package com.coding.basic.tree;
 
 public class BinaryTreeNode<T> {
 
-    private T data;
-    private BinaryTreeNode<T> left;
-    private BinaryTreeNode<T> right;
-    private BinaryTreeNode<T> parent;
+    T data;
+    BinaryTreeNode<T> left;
+    BinaryTreeNode<T> right;
+    BinaryTreeNode<T> parent;
 
     public BinaryTreeNode(T data) {
         this.data = data;
