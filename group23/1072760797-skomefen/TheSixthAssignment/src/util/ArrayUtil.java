@@ -5,7 +5,7 @@ import java.lang.reflect.Array;
 public class ArrayUtil {
 	
 	public static <T>T[] changeLength(T[] array,Class<T>type,int growth) {
-
+		
 		if(array==null){
 			return null;
 		}
