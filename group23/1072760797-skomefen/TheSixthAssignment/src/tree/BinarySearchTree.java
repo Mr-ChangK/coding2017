@@ -1,8 +1,12 @@
 package tree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -77,6 +81,31 @@ public class BinarySearchTree<T extends Comparable> {
 		return allLeaf;
 	}
 
+	public HashMap<BinaryTreeNode<T>, Integer> getAllNode(
+			BinaryTreeNode<T> node, int level) {
+
+		if (level < 1) {
+			throw new RuntimeException("level must bigger 0");
+		}
+		if (node == null) {
+			return null;
+		}
+
+		HashMap<BinaryTreeNode<T>, Integer> allLeaf = new HashMap<BinaryTreeNode<T>, Integer>();
+
+		allLeaf.put(node, level);
+
+		if (isLeafNode(node)) {
+			return allLeaf;
+		}
+
+		if (node.getLeft() != null)
+			allLeaf.putAll((getAllNode(node.getLeft(), level + 1)));
+		if (node.getRight() != null)
+			allLeaf.putAll((getAllNode(node.getRight(), level + 1)));
+		return allLeaf;
+	}
+
 	public boolean isLeafNode(BinaryTreeNode<T> node) {
 
 		if (node == null) {
@@ -143,7 +172,8 @@ public class BinarySearchTree<T extends Comparable> {
 
 		if (rightChild != null) {
 
-			BinarySearchTree<T> rightSearch = new BinarySearchTree<T>(rightChild);
+			BinarySearchTree<T> rightSearch = new BinarySearchTree<T>(
+					rightChild);
 			T min = rightSearch.findMin();
 			BinaryTreeNode<T> minNode = rightSearch.getNode(min);
 
@@ -195,7 +225,7 @@ public class BinarySearchTree<T extends Comparable> {
 		ArrayList<BinaryTreeNode<T>> allNode = getAllNode(root);
 
 		for (BinaryTreeNode<T> e : allNode) {
-			if(isParent(e, node))
+			if (isParent(e, node))
 				return e;
 		}
 
@@ -251,20 +281,232 @@ public class BinarySearchTree<T extends Comparable> {
 
 	public List<T> levelVisit() {
 
-		return null;
+		if (root == null) {
+			return null;
+		}
+
+		HashMap<BinaryTreeNode<T>, Integer> allNodeMap = getAllNode(root, 1);
+		List<T> allNode = new ArrayList<T>();
+
+		for (int i = 1; i <= height(); i++) {
+			for (Entry<BinaryTreeNode<T>, Integer> e : allNodeMap.entrySet()) {
+				if (e.getValue() == i)
+					allNode.add(e.getKey().getData());
+			}
+		}
+
+		return allNode;
 	}
 
 	public boolean isValid() {
-		return false;
+		ArrayList<BinaryTreeNode<T>> allNode = getAllNode(root);
+		for (BinaryTreeNode<T> node : allNode) {
+			BinaryTreeNode<T> leftChild = node.getLeft();
+			BinaryTreeNode<T> rightChild = node.getRight();
+			if (leftChild != null) {
+				if (leftChild.getData().compareTo(node.getData()) >= 0) {
+					return false;
+				}
+			}
+			if (rightChild != null) {
+				if (rightChild.getData().compareTo(node.getData()) <= 0) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	public T getLowestCommonAncestor(T n1, T n2) {
-		return null;
 
+		List<BinaryTreeNode<T>> n1Ancestors = getAncestors(n1);
+		List<BinaryTreeNode<T>> n2Ancestors = getAncestors(n2);
+
+		if (n1Ancestors == null || n2Ancestors == null)
+			return null;
+
+		List<BinaryTreeNode<T>> commonAncestors = commonNode(n1Ancestors,
+				n2Ancestors);
+
+		if (commonAncestors == null)
+			return null;
+
+		HashMap<BinaryTreeNode<T>, Integer> allNode = getAllNode(root, 1);
+
+		int commonAncestorsLevel = 1;
+
+		T lowestCommonAncestor = null;
+
+		for (Entry<BinaryTreeNode<T>, Integer> e : allNode.entrySet()) {
+			for (BinaryTreeNode<T> ca : commonAncestors) {
+				if (e.getKey() == ca && e.getValue() >= commonAncestorsLevel) {
+					commonAncestorsLevel = e.getValue();
+					lowestCommonAncestor = e.getKey().getData();
+				}
+			}
+		}
+
+		return lowestCommonAncestor;
+
+	}
+
+	private List<BinaryTreeNode<T>> commonNode(
+			List<BinaryTreeNode<T>> n1List,
+			List<BinaryTreeNode<T>> n2List) {
+
+		if (n1List == null || n2List == null)
+			return null;
+
+		List<BinaryTreeNode<T>> commonNode = new ArrayList<BinaryTreeNode<T>>();
+		for (BinaryTreeNode<T> n1a : n1List) {
+
+			for (BinaryTreeNode<T> n2a : n2List) {
+				if (n1a == n2a)
+					commonNode.add(n1a);
+			}
+
+		}
+
+		if (commonNode.isEmpty())
+			return null;
+
+		return commonNode;
+	}
+
+	public List<BinaryTreeNode<T>> getAncestors(T node) {
+		if (root == null)
+			return null;
+		BinaryTreeNode<T> btnode = getNode(node);
+		if (btnode == null)
+			return null;
+		return getAncestors(btnode);
+	}
+
+	public List<BinaryTreeNode<T>> getAncestors(BinaryTreeNode<T> node) {
+
+		List<BinaryTreeNode<T>> ancestors = new ArrayList<BinaryTreeNode<T>>();
+
+		if (root == null)
+			return null;
+
+		if (node == null)
+			return null;
+
+		BinaryTreeNode<T> ancestor = getParent(node);
+
+		if (ancestor == null)
+			return null;
+
+		while (true) {
+
+			ancestors.add(ancestor);
+			ancestor = getParent(ancestor);
+
+			if (ancestor == null) {
+				break;
+			}
+		}
+		return ancestors;
 	}
 
 	public List<T> getNodesBetween(T n1, T n2) {
-		return null;
+		
+		List<BinaryTreeNode<T>> n1Ancestor =getAncestors(n1);
+		List<BinaryTreeNode<T>> n2Ancestor =getAncestors(n2);
+		
+		List<BinaryTreeNode<T>> comminAncestor = commonNode(n1Ancestor, n2Ancestor);
+		if(comminAncestor == null)
+			comminAncestor = new ArrayList<BinaryTreeNode<T>>();
+		comminAncestor.add(getNode(n1));
+		comminAncestor.add(getNode(n2));
+		
+		List<BinaryTreeNode<T>> resultNode = new ArrayList<BinaryTreeNode<T>>();
+		
+		if(n1Ancestor!=null)
+			resultNode.addAll(n1Ancestor);
+		if(n2Ancestor!=null)
+			resultNode.addAll(n2Ancestor);
+		
+		//去掉重复元素
+		HashSet<BinaryTreeNode<T>> hs = new HashSet<BinaryTreeNode<T>>(resultNode);
+		resultNode.clear();
+		resultNode.addAll(hs);
+		
+		resultNode.removeAll(comminAncestor);
+		
+		T lowestCommonAncestor = getLowestCommonAncestor(n1, n2);
+		if(lowestCommonAncestor!=null){
+			BinaryTreeNode<T> lowestCommonAncestorNode = getNode(lowestCommonAncestor);
+			resultNode.add(lowestCommonAncestorNode);
+		}
+		
+		if(resultNode == null)
+			return null;
+			
+		List<T> nodeData = new ArrayList<T>();
+		for(BinaryTreeNode<T> node:resultNode){
+			nodeData.add(node.getData());
+		}
+		
+		nodeData.sort(new Comparator<T>() {
+
+			public int compare(T o1, T o2) {			
+				return o1.compareTo(o2);
+			}
+		});
+		
+		return nodeData;
 	}
 
+	public int nodeLevel(T n){
+		
+		if (n==null) 
+			return -1;
+		
+		List<BinaryTreeNode<T>>ancestor = getAncestors(n);
+		
+		if(ancestor==null)
+			return -1;
+		
+		return ancestor.size()+1;
+	}
+	
+	public Map<BinaryTreeNode<T>, Integer> getAncestorsMap(T node) {
+		if (root == null)
+			return null;
+		if (node == null)
+			return null;
+		BinaryTreeNode<T> btnode = getNode(node);
+		if (btnode == null)
+			return null;
+		return getAncestorsMap(btnode);
+	}
+
+	public Map<BinaryTreeNode<T>, Integer> getAncestorsMap(
+			BinaryTreeNode<T> node) {
+
+		if (root == null)
+			return null;
+		if (node == null)
+			return null;
+		
+		List<BinaryTreeNode<T>> ancestorsList = getAncestors(node);
+		
+		if (ancestorsList == null)
+			return null;
+		
+		Map<BinaryTreeNode<T>, Integer> allNode = getAllNode(root, 1);
+		Map<BinaryTreeNode<T>, Integer> ancestorsMap = new HashMap<BinaryTreeNode<T>, Integer>();
+		
+		for (Entry<BinaryTreeNode<T>, Integer> e : allNode.entrySet()) {
+			if (ancestorsList.contains(e.getKey())) {
+				ancestorsMap.put(e.getKey(), e.getValue());
+			}
+		}
+		
+		if (ancestorsMap.isEmpty()) {
+			return null;
+		}
+		return ancestorsMap;
+	}
 }
