@@ -411,51 +411,24 @@ public class BinarySearchTree<T extends Comparable> {
 
 	public List<T> getNodesBetween(T n1, T n2) {
 		
-		List<BinaryTreeNode<T>> n1Ancestor =getAncestors(n1);
-		List<BinaryTreeNode<T>> n2Ancestor =getAncestors(n2);
-		
-		List<BinaryTreeNode<T>> comminAncestor = commonNode(n1Ancestor, n2Ancestor);
-		if(comminAncestor == null)
-			comminAncestor = new ArrayList<BinaryTreeNode<T>>();
-		comminAncestor.add(getNode(n1));
-		comminAncestor.add(getNode(n2));
-		
-		List<BinaryTreeNode<T>> resultNode = new ArrayList<BinaryTreeNode<T>>();
-		
-		if(n1Ancestor!=null)
-			resultNode.addAll(n1Ancestor);
-		if(n2Ancestor!=null)
-			resultNode.addAll(n2Ancestor);
-		
-		//去掉重复元素
-		HashSet<BinaryTreeNode<T>> hs = new HashSet<BinaryTreeNode<T>>(resultNode);
-		resultNode.clear();
-		resultNode.addAll(hs);
-		
-		resultNode.removeAll(comminAncestor);
-		
-		T lowestCommonAncestor = getLowestCommonAncestor(n1, n2);
-		if(lowestCommonAncestor!=null){
-			BinaryTreeNode<T> lowestCommonAncestorNode = getNode(lowestCommonAncestor);
-			resultNode.add(lowestCommonAncestorNode);
-		}
-		
-		if(resultNode == null)
+		if(root==null)
 			return null;
-			
-		List<T> nodeData = new ArrayList<T>();
-		for(BinaryTreeNode<T> node:resultNode){
-			nodeData.add(node.getData());
+		
+		List<BinaryTreeNode<T>> allNode = getAllNode(root);
+		
+		List<T> result = new ArrayList<T>();
+		for(BinaryTreeNode<T> e:allNode){
+			T data = e.getData();
+			if(n1.compareTo(data)<0&&n2.compareTo(data)>0)
+				result.add(data);
 		}
 		
-		nodeData.sort(new Comparator<T>() {
-
-			public int compare(T o1, T o2) {			
-				return o1.compareTo(o2);
-			}
-		});
+		//排序
+		HashSet<T> hs = new HashSet<T>(result);
+		result.clear();
+		result.addAll(hs);
 		
-		return nodeData;
+		return result;
 	}
 
 	public int nodeLevel(T n){

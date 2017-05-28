@@ -91,9 +91,9 @@ public class BinarySearchTreeTest {
 	
 	@Test
 	public void testGetNodesBetween(){
-		Assert.assertEquals("[2, 4]", tree.getNodesBetween(1, 3).toString());
-		Assert.assertEquals("[2, 6]", tree.getNodesBetween(1, 8).toString());
-		Assert.assertEquals("[2]", tree.getNodesBetween(1, 6).toString());
+		Assert.assertEquals("[2]", tree.getNodesBetween(1, 3).toString());
+		Assert.assertEquals("[2, 3, 4, 6]", tree.getNodesBetween(1, 8).toString());
+		Assert.assertEquals("[2, 3, 4]", tree.getNodesBetween(1, 6).toString());
 
 	}
 }
