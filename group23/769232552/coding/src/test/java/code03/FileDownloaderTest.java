@@ -1,12 +1,13 @@
 package code03;
 
+import code03.v1.FileDownloader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import code03.api.ConnectionManager;
-import code03.api.DownloadListener;
-import code03.impl.ConnectionManagerImpl;
+import code03.v1.api.ConnectionManager;
+import code03.v1.api.DownloadListener;
+import code03.v1.impl.ConnectionManagerImpl;
 
 public class FileDownloaderTest {
 	boolean downloadFinished = false;
