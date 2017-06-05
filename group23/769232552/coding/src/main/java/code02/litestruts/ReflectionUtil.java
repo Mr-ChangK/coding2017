@@ -33,6 +33,7 @@ public class ReflectionUtil {
                 logger.warn("加载类 " + className + "出错！");
             }
         }
+
     }
 
 
@@ -95,13 +96,13 @@ public class ReflectionUtil {
     }
 
     //返回以set开头的方法
-    public List<Method> getSetterMethods(Object o){
-        return getMethods(o.getClass(),"set");
+    public List<Method> getSetterMethods(Class<?> clz){
+        return getMethods(clz,"set");
     }
 
     //返回以get开头的方法
-    public List<Method> getGetterMethods(Object o){
-        return getMethods(o.getClass(),"get");
+    public List<Method> getGetterMethods(Class<?> clz){
+        return getMethods(clz,"get");
     }
 
     private List<Method> getMethods(Class<?> clz, String startWithName){
