@@ -38,7 +38,7 @@ public class Struts {
        /* 4. 通过反射找到对象的所有getter方法（例如 getMessage）,通过反射来调用，
        把值和属性形成一个HashMap , 例如 {"message":  "登录成功"} ,放到View对象的parameters*/
         Map params = new HashMap<String, String>();
-        List<Method> methods = reflectionUtil.getGetterMethods(o);
+        List<Method> methods = reflectionUtil.getGetterMethods(o.getClass());
         for(Method method : methods){
             String key = method.getName().substring(3);
             String value = null;

@@ -1,21 +1,31 @@
 package mini_jvm.loader;
 
+import mini_jvm.clz.ClassFile;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 
 public class ClassFileLoader {
 
 	private List<String> clzPaths = new ArrayList<String>();
 
+	public ClassFile loadClass(String className){
+		byte[] byteCodes = readBinaryCode(className);
+		ClassFileParser classFileParser = new ClassFileParser();
+		ClassFile clzFile = classFileParser.parse(byteCodes);
+		return clzFile;
+	}
+
+
 	/**
 	 * 读取class文件的二进制代码
 	 * @param className
 	 * @return
      */
-	public byte[] readBinaryCode(String className) {
+	public byte[] readBinaryCodeV1(String className) {
 		String clazzPath = getClassPath(className);
 		BufferedInputStream bins = null;
 		ByteArrayOutputStream  bouts = new ByteArrayOutputStream();
@@ -46,6 +56,24 @@ public class ClassFileLoader {
 		}
 		return codes;
 	}
+
+	/**
+	 * 使用IOUtils.toByteArray()读取流文件
+	 */
+	public byte[] readBinaryCode(String className){
+		String clzPath = getClassPath(className);
+		File f = new File(clzPath);
+		try{
+			return IOUtils.toByteArray(new FileInputStream(f));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 
 	/**
 	 * 从扫描根目录，获取指定类的绝对路径
@@ -104,5 +132,13 @@ public class ClassFileLoader {
 		}
 		sb.append(clzPaths.get(i));
 		return sb.toString();
+	}
+
+	public static void main(String[] args) {
+		String FULL_QUALIFIED_CLASS_NAME = "mini_jvm/test/EmployeeV1";
+		String path1 = "D:\\worksapce\\gitRepo\\java_coding2017\\coding2017\\group23\\769232552\\coding\\target\\test-classes\\mini_jvm";
+		ClassFileLoader loader = new ClassFileLoader();
+		loader.addClassPath(path1);
+		String className = "mini_jvm.test.EmployeeV1";
 	}
 }
